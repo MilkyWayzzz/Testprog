@@ -18,13 +18,10 @@ namespace ConsoleClient
                 {
                     case "viewuserslist":
                         {
-                            var listusers = service.GetListUser();
+                            var listusers = service.GetListUser().Result;
                             foreach (var item in listusers)
                             {
-                                Console.WriteLine(item.First_Name);
-                                Console.WriteLine(item.Last_Name);
-                                Console.WriteLine(item.Age);
-                                Console.WriteLine(item.Mail);
+                                Console.WriteLine(item.Id + "  " + item.FirstName + "  " + item.LastName + "  " + item.Age + "  " + item.Email);
                             }
                         }
                         break;
@@ -32,11 +29,8 @@ namespace ConsoleClient
                         {
                             Console.WriteLine("Enter user ID");
                             var id = Convert.ToInt32(Console.ReadLine());
-                            var user = service.GetUser(id);
-                            Console.WriteLine(user.First_Name);
-                            Console.WriteLine(user.Last_Name);
-                            Console.WriteLine(user.Age);
-                            Console.WriteLine(user.Mail);
+                            var user = service.GetUser(id).Result;
+                            Console.WriteLine(user.Id + "  " + user.FirstName + "  " + user.LastName + "  " + user.Age + "  " + user.Email);
                         }
                         break;
                     case "add":
@@ -50,13 +44,15 @@ namespace ConsoleClient
                             var age = Convert.ToInt32(Console.ReadLine());
                             Console.WriteLine("Enter Mail");
                             var mail = Console.ReadLine();
-                            User user = new User() { First_Name = name, Last_Name = lastname, Age = age, Mail = mail };
+                            User user = new User() { FirstName = name, LastName = lastname, Age = age, Email = mail };
                             service.Create(user);
                             Console.WriteLine("User success added");
                         }
                         break;
                     case "update":
                         {
+                            Console.WriteLine("Enter ID");
+                            int id = Convert.ToInt32(Console.ReadLine());
                             Console.WriteLine("Enter Name");
                             var name = Console.ReadLine();
                             Console.WriteLine("Enter Last Name");
@@ -65,8 +61,8 @@ namespace ConsoleClient
                             var age = Convert.ToInt32(Console.ReadLine());
                             Console.WriteLine("Enter Mail");
                             var mail = Console.ReadLine();
-                            User user = new User() { First_Name = name, Last_Name = lastname, Age = age, Mail = mail };
-                            service.Update(user);
+                            User user = new User() {FirstName = name, LastName = lastname, Age = age, Email = mail };
+                            service.Update( id, user);
                             Console.WriteLine("User success updated");
                         }
                         break;

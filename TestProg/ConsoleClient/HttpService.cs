@@ -1,42 +1,49 @@
 ﻿using Domain;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleClient
 {
     public class HttpService
     {
-        //Users CRUD GetUserData GetListUsers  
+        //Users CRUD GetUserData GetListUsers
+        HttpClient client = new HttpClient();
         List<User> users = new List<User>();
 
-        public  User GetUser (int id )
+        public async Task<User> GetUser (int id )
         {
-            var user = users.FirstOrDefault(x => x.ID == id);
-            return user;
+            var response = await client.GetAsync("https://localhost:44338/api/users/"+id);
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<User>(json);
         }
-        public List<User> GetListUser()
+        public async Task<List<User>> GetListUser()
         {
-            return users;
+            var response = await client.GetAsync("https://localhost:44338/api/users");
+            var json = await response.Content.ReadAsStringAsync();
+            
+            return JsonConvert.DeserializeObject<List<User>>(json);
         }
-        public void Create(User user)
+        public async Task Create(User user)
         {
-            users.Add(user);
+            var userjson = JsonConvert.SerializeObject(user);
+            var content = new StringContent(userjson, Encoding.UTF8, "application/json");
+            await client.PostAsync("https://localhost:44338/api/users",content);
             
         }
-        public void Update(User user)
+        public async Task Update(int id , User user)
         {
-            var userfind = users.FirstOrDefault(x => x.ID == user.ID);
-            userfind.Age = user.Age;
-            userfind.First_Name = user.First_Name;
-            userfind.Last_Name = user.Last_Name;
-            userfind.Mail = user.Mail;
+            var userjson = JsonConvert.SerializeObject(user);
+            var content = new StringContent(userjson, Encoding.UTF8, "application/json");
+            await client.PutAsync("https://localhost:44338/api/users/" + id, content);
         }
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
-            var user = users.FirstOrDefault(x => x.ID == id);
-            users.Remove(user);
+            await client.DeleteAsync("https://localhost:44338/api/users/" + id);
         }
     }
 }
