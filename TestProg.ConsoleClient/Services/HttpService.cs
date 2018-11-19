@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using TestProg.ConsoleClient.Exceptions;
 using TestProg.ConsoleClient.Models.RequestModels;
 using TestProg.ConsoleClient.Models.ResponseModels;
 
@@ -25,7 +26,7 @@ namespace ConsoleClient.Services
             var response = await _client.GetAsync($"{baseUserAPIURL}/{id}");
 
             if (!response.IsSuccessStatusCode)
-                return null;
+                throw new HttpServiceException("Service error");
 
             var json = await response.Content.ReadAsStringAsync();
 
@@ -37,14 +38,14 @@ namespace ConsoleClient.Services
             var response = await _client.GetAsync(baseUserAPIURL);
 
             if (!response.IsSuccessStatusCode)
-                return null;
+                throw new HttpServiceException("Service error");
 
             var json = await response.Content.ReadAsStringAsync();
             
             return JsonConvert.DeserializeObject<List<GetUserResponse>>(json);
         }
 
-        public async Task<bool> CreateUserAsync(PostUserRequest user)
+        public async Task CreateUserAsync(PostUserRequest user)
         {
             var json = JsonConvert.SerializeObject(user);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -52,12 +53,10 @@ namespace ConsoleClient.Services
             var response = await _client.PostAsync(baseUserAPIURL, content);
 
             if (!response.IsSuccessStatusCode)
-                return false;
-
-            return true;
+                throw new HttpServiceException("Service error");
         }
 
-        public async Task<bool> UpdateUserAsync(int id, PutUserRequest user)
+        public async Task UpdateUserAsync(int id, PutUserRequest user)
         {
             var json = JsonConvert.SerializeObject(user);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -65,19 +64,15 @@ namespace ConsoleClient.Services
             var response = await _client.PutAsync($"{baseUserAPIURL}/{id}", content);
 
             if (!response.IsSuccessStatusCode)
-                return false;
-
-            return true;
+                throw new HttpServiceException("Service error");
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(int id)
         {
             var response = await _client.DeleteAsync($"{baseUserAPIURL}/{id}");
 
             if (!response.IsSuccessStatusCode)
-                return false;
-
-            return true;
+                throw new HttpServiceException("Service error");
         }
     }
 }
