@@ -26,7 +26,13 @@ namespace ConsoleClient
                         {
                             var users = _httpService.GetUsersAsync().Result;
 
-                            if(users == null || users.Count == 0)
+                            if(users == null)
+                            {
+                                Console.WriteLine("Service error");
+                                break;
+                            }
+                                
+                            if(users.Count == 0)
                             {
                                 Console.WriteLine("No users");
                                 break;
@@ -43,6 +49,13 @@ namespace ConsoleClient
                             Console.WriteLine("Enter user ID");
                             var id = Convert.ToInt32(Console.ReadLine());
                             var user = _httpService.GetUserAsync(id).Result;
+
+                            if (user == null)
+                            {
+                                Console.WriteLine("Service error");
+                                break;
+                            }
+                                
                             Console.WriteLine(user.Id + "  " + user.FirstName + "  " + user.LastName + "  " + user.Age + "  " + user.Email);
                         }
                         break;
@@ -57,7 +70,15 @@ namespace ConsoleClient
                             Console.WriteLine("Enter Mail");
                             var mail = Console.ReadLine();
                             var user = new PostUserRequest() { FirstName = name, LastName = lastname, Age = age, Email = mail };
-                            _httpService.CreateUserAsync(user).Wait();
+
+                            var isSuccess = _httpService.CreateUserAsync(user).Result;
+
+                            if (!isSuccess)
+                            {
+                                Console.WriteLine("Service error");
+                                break;
+                            }
+
                             Console.WriteLine("User successfully added");
                         }
                         break;
@@ -74,7 +95,15 @@ namespace ConsoleClient
                             Console.WriteLine("Enter Mail");
                             var mail = Console.ReadLine();
                             var user = new PutUserRequest() {FirstName = name, LastName = lastname, Age = age, Email = mail };
-                            _httpService.UpdateUserAsync(id, user).Wait();
+
+                            var isSuccess = _httpService.UpdateUserAsync(id, user).Result;
+
+                            if (!isSuccess)
+                            {
+                                Console.WriteLine("Service error");
+                                break;
+                            }
+
                             Console.WriteLine("User successfully updated");
                         }
                         break;
@@ -82,7 +111,15 @@ namespace ConsoleClient
                         {
                             Console.WriteLine("Enter user ID");
                             var id = Convert.ToInt32(Console.ReadLine());
-                            _httpService.DeleteUserAsync(id).Wait();
+
+                            var isSuccess = _httpService.DeleteUserAsync(id).Result;
+
+                            if (!isSuccess)
+                            {
+                                Console.WriteLine("Service error");
+                                break;
+                            }
+
                             Console.WriteLine("User successfully deleted");
                         }
                         break;
