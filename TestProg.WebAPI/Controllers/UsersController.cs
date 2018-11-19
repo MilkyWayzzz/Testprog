@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ServerAPI.Models;
+using TestProg.Data;
+using TestProg.Data.Entities;
 
 namespace ServerAPI.Controllers
 {
@@ -13,18 +14,18 @@ namespace ServerAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserContext _userContext;
+        private readonly DataContext _dataContext;
 
-        public UsersController(UserContext userContext)
+        public UsersController(DataContext dataContext)
         {
-            _userContext = userContext;
+            _dataContext = dataContext;
         }
 
         // GET api/users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> Get()
         {
-            var users = await _userContext.Users.ToListAsync();
+            var users = await _dataContext.Users.ToListAsync();
 
             return users;
         }
@@ -33,7 +34,7 @@ namespace ServerAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> Get(int id)
         {
-            var user = await _userContext.Users.FirstOrDefaultAsync(x=>x.Id == id);
+            var user = await _dataContext.Users.FirstOrDefaultAsync(x=>x.Id == id);
 
             if (user == null)
                 return BadRequest();
@@ -48,9 +49,9 @@ namespace ServerAPI.Controllers
             if (user == null || user.FirstName == null || user.LastName == null || user.Age == 0 || user.Email == null)
                 return;
 
-            _userContext.Users.Add(user);
+            _dataContext.Users.Add(user);
 
-            await _userContext.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
         }
 
 
@@ -61,7 +62,7 @@ namespace ServerAPI.Controllers
             if (id == 0 || user == null || user.FirstName == null || user.LastName == null || user.Age == 0 || user.Email == null)
                 return;
 
-            var userDb = await _userContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var userDb = await _dataContext.Users.FirstOrDefaultAsync(x => x.Id == id);
 
             if (userDb == null)
                 return;
@@ -71,21 +72,21 @@ namespace ServerAPI.Controllers
             userDb.Email = user.Email;
             userDb.Age = user.Age;
 
-            await _userContext.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
         }
 
         // DELETE api/users/5
         [HttpDelete("{id}")]
         public async Task Delete(int id)
         {
-            var userDb = await _userContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var userDb = await _dataContext.Users.FirstOrDefaultAsync(x => x.Id == id);
 
             if (userDb == null)
                 return;
 
-            _userContext.Users.Remove(userDb);
+            _dataContext.Users.Remove(userDb);
 
-            await _userContext.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
         }
     }
 }

@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using TestProg.Data.Entities;
 
-namespace ServerAPI.Models
+namespace TestProg.Data
 {
-    public class UserContext : DbContext
+    public class DataContext : DbContext
     {
         public DbSet<User> Users { get; set; }
-        public UserContext(DbContextOptions<UserContext> options)
+        public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
             Database.EnsureCreated();

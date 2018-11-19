@@ -1,41 +1,53 @@
-﻿using Domain;
+﻿using ConsoleClient.Services;
 using System;
+using TestProg.ConsoleClient.Models.RequestModels;
+using TestProg.ConsoleClient.Models.ResponseModels;
 
 namespace ConsoleClient
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            HttpService service = new HttpService();
-            
+        static HttpService _httpService = new HttpService();
 
+        static void Main(string[] args)
+        {           
             while (true)
             {
-                Console.WriteLine("Change event: add, update, delete, viewuser, viewuserslist");
+                Console.WriteLine("Available commands:");
+                Console.WriteLine("create user");
+                Console.WriteLine("update user");
+                Console.WriteLine("delete user");
+                Console.WriteLine("get user");
+                Console.WriteLine("get users");
                 var userstring = Console.ReadLine().ToLower();
                 switch (userstring)
                 {
-                    case "viewuserslist":
+                    case "get users":
                         {
-                            var listusers = service.GetListUser().Result;
-                            foreach (var item in listusers)
+                            var users = _httpService.GetUsersAsync().Result;
+
+                            if(users == null || users.Count == 0)
+                            {
+                                Console.WriteLine("No users");
+                                break;
+                            }
+
+                            foreach (var item in users)
                             {
                                 Console.WriteLine(item.Id + "  " + item.FirstName + "  " + item.LastName + "  " + item.Age + "  " + item.Email);
                             }
                         }
                         break;
-                    case "viewuser":
+                    case "get user":
                         {
                             Console.WriteLine("Enter user ID");
                             var id = Convert.ToInt32(Console.ReadLine());
-                            var user = service.GetUser(id).Result;
+                            var user = _httpService.GetUserAsync(id).Result;
                             Console.WriteLine(user.Id + "  " + user.FirstName + "  " + user.LastName + "  " + user.Age + "  " + user.Email);
                         }
                         break;
-                    case "add":
+                    case "create user":
                         {
-
                             Console.WriteLine("Enter Name");
                             var name = Console.ReadLine();
                             Console.WriteLine("Enter Last Name");
@@ -44,12 +56,12 @@ namespace ConsoleClient
                             var age = Convert.ToInt32(Console.ReadLine());
                             Console.WriteLine("Enter Mail");
                             var mail = Console.ReadLine();
-                            User user = new User() { FirstName = name, LastName = lastname, Age = age, Email = mail };
-                            service.Create(user);
-                            Console.WriteLine("User success added");
+                            var user = new PostUserRequest() { FirstName = name, LastName = lastname, Age = age, Email = mail };
+                            _httpService.CreateUserAsync(user).Wait();
+                            Console.WriteLine("User successfully added");
                         }
                         break;
-                    case "update":
+                    case "update user":
                         {
                             Console.WriteLine("Enter ID");
                             int id = Convert.ToInt32(Console.ReadLine());
@@ -61,17 +73,17 @@ namespace ConsoleClient
                             var age = Convert.ToInt32(Console.ReadLine());
                             Console.WriteLine("Enter Mail");
                             var mail = Console.ReadLine();
-                            User user = new User() {FirstName = name, LastName = lastname, Age = age, Email = mail };
-                            service.Update( id, user);
-                            Console.WriteLine("User success updated");
+                            var user = new PutUserRequest() {FirstName = name, LastName = lastname, Age = age, Email = mail };
+                            _httpService.UpdateUserAsync(id, user).Wait();
+                            Console.WriteLine("User successfully updated");
                         }
                         break;
-                    case "delete":
+                    case "delete user":
                         {
                             Console.WriteLine("Enter user ID");
                             var id = Convert.ToInt32(Console.ReadLine());
-                            service.Delete(id);
-                            Console.WriteLine("User success deleted");
+                            _httpService.DeleteUserAsync(id).Wait();
+                            Console.WriteLine("User successfully deleted");
                         }
                         break;
                     default:
